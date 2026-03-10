@@ -1,9 +1,25 @@
+"""Toronto Housing Potential Dashboard - Main Application.
+
+This module serves as the entry point for the Toronto Housing Potential 
+Dashboard. It initializes the Gradio web interface, manages global 
+application state (SPARQL endpoints and prefixes), and orchestrates 
+the interaction between the geocoding logic, SPARQL client, and UI components.
+
+The dashboard allows users to:
+1. Search for Toronto addresses to identify specific land parcels.
+2. Visualize parcel boundaries and surrounding urban data on an interactive map.
+3. Perform advanced spatial and regulatory queries (Zoning, Services, Demographics).
+
+Environment Variables:
+    SPARQL_ENDPOINT: The URL for the GraphDB/RDF triple store.
+    Note: These are loaded via a .env file.
+
+Attributes:
+    PREFIXES (str): A global string containing all SPARQL namespace 
+        declarations required for the application's semantic queries.
+"""
 #!/usr/bin/env python
 # coding: utf-8
-
-# In[1]:
-
-
 #!/usr/bin/env python
 # coding: utf-8
 # main demo file - notebook version to be used for testing and development
@@ -52,8 +68,15 @@ PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>
 
 # --- UI Setup ---
 with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
+    """Defines the Gradio Blocks layout and event-driven logic.
+    
+    The UI is split into two main sections:
+    1. Search & Map: Geocoding input for parcel search and spatial visualization (base map).
+    2. Advanced Queries: Iterative data retrieval for zoning, services, 
+       and demographics.
+    """
     # --- Hidden State ---
-    # Store required varialbes between button clicks
+    # Used to store variables for context across interactions
     selected_parcel_uri = gr.State("")  #parcel id
     endpoint_state = gr.State(value=SPARQL_ENDPOINT) #endpoint
     prefix_state = gr.State(value=PREFIXES) #query prefixes
@@ -108,14 +131,3 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
     )
 #demo.launch(server_name="0.0.0.0", server_port=7860, share=True)
 demo.launch()
-
-
-
-
-
-
-# In[ ]:
-
-
-
-

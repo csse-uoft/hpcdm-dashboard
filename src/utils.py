@@ -1,11 +1,38 @@
+"""Utility functions for processing and aggregating urban data.
+
+This module acts as the processing layer between the raw SPARQL client and 
+the UI components. It handles iterative querying (e.g., looping through 
+service classes), data cleaning, and the transformation of geographic 
+results into structured lists for map rendering.
+
+Functions in this module typically return both a pandas DataFrame for 
+table display and a list of dictionaries for Plotly map features.
+"""
 from src.sparql_client import *
 import gradio as gr
 import numpy as np
 def process_service_data(endpoint,prefixes,pid,progress=gr.Progress()):
-    """Retrieves the services available to a given parcel IRI.
-    Note: currently only maps services with site locations
-    TBD whether we also want to display catchment areas (when available)
-    Stage 1: Get classes. Stage 2: Loop through classes for details."""
+    """Iteratively retrieves and aggregates service data for a parcel.
+
+    This function first identifies all available service types in the graph, 
+    then performs individual queries for each type to gather specific details 
+    like site locations and capacities.
+     Stage 1: Get classes. Stage 2: Loop through classes for details.
+
+    Args:
+        endpoint (str): The SPARQL endpoint URL.
+        prefixes (str): SPARQL namespace declarations.
+        pid (str): The persistent identifier (IRI) of the target parcel.
+        progress (gr.Progress): Gradio progress tracker for UI feedback.
+
+    Returns:
+        tuple[pd.DataFrame, list[dict]]: A tuple containing:
+            - final_df: Combined DataFrame of all found services.
+            - map_features: List of dicts containing 'wkt', 'label', and 'servicename'.
+    
+    Todo:
+        * Test and assess whether to include catchment areas for services (when available) in addition to service sites.
+    """
     # --- STAGE 1: Get List of Service leaf classes defined in the graph ---
     progress(0, desc="Identifying Service Types...")
     class_names = fetch_service_classes(endpoint,prefixes)
@@ -35,8 +62,8 @@ def process_service_data(endpoint,prefixes,pid,progress=gr.Progress()):
                 # Append the new batch to your master list
                 map_features.extend(new_features)
         except Exception as e:
-            print(f"Loop Error: {e}")
-            return pd.DataFrame(), []
+            print(f"Loop Error for {servicetype}: {e}")
+            continue
     #initialize dataframe
     final_df = pd.DataFrame()
     # Final Aggregation
@@ -50,7 +77,19 @@ def process_service_data(endpoint,prefixes,pid,progress=gr.Progress()):
         return pd.DataFrame(), []
     
 def process_neighbourhood_demographics(endpoint,prefixes,pid,census_characteristics):
-    """processes results of demographic query for display"""
+    """Processes demographic query results and extracts (unique) census tracts in the neighbourhood for display.
+
+    Args:
+        endpoint (str): The SPARQL endpoint URL.
+        prefixes (str): SPARQL namespace declarations.
+        pid (str): The parcel IRI used to anchor the neighborhood search.
+        census_characteristics (list[str]): List of census characteristic URIs.
+
+    Returns:
+        tuple[pd.DataFrame, list[dict]]: A tuple containing:
+            - demo_df: Raw demographic results.
+            - map_features: List of unique census tract WKTs and labels.
+    """
     #initialize list of map features
     map_features=[]
     #query results dataframe
@@ -69,15 +108,39 @@ def process_neighbourhood_demographics(endpoint,prefixes,pid,census_characterist
     return demo_df,map_features
 
 def process_compliance_properties(endpoint,prefixes):
-    """returns a list of properties constrained by the zoning bylaw regulations in a format suitable for dropdown creation:
-    [(att1 label, att1 uri),(att2 label, att2 uri),...]"""
+    """Formats constrained (by zoning bylaws) properties into a list compatible with Gradio dropdowns.
+
+    Args:
+        endpoint (str): The SPARQL endpoint URL.
+        prefixes (str): SPARQL namespace declarations.
+
+    Returns:
+        list[tuple[str, str]]: A list of (label, uri) tuples.
+    """
     df = fetch_compliance_properties(endpoint,prefixes)
     property_list = list(zip(df['cp_label'], df['cp']))
     return property_list
 
 def process_zoning_compliance(endpoint,prefixes,pid,property):
-    """Returns a pandas dataframe that lists the zoning regulations that apply to nearby (within 200m) parcels, and the corresponding actual values (if available).
-    Includes a list of map features of all of the "nearby" properties colour coded-based on compliance (if available)."""
+    """Processes zoning compliance for nearby parcels and extracts spatial status.
+
+    Extracts a short-form Parcel ID for display and categorizes map features 
+    by their compliance status (e.g., 'compliant', 'noncompliant').
+
+    Args:
+        endpoint (str): The SPARQL endpoint URL.
+        prefixes (str): SPARQL namespace declarations.
+        pid (str): The source parcel IRI.
+        property (str): The specific property IRI to evaluate compliance for.
+
+    Returns:
+        tuple[pd.DataFrame, list[dict]]: A tuple containing:
+            - df: Detailed compliance DataFrame.
+            - map_features: List of nearby parcel geometries with status labels.
+    Todo:
+        * move the distance limit for 'nearby' to a parameter of this function
+    """
+
     #initialize list of map features
     map_features=[]
     #query results dataframe
@@ -102,7 +165,16 @@ def process_zoning_compliance(endpoint,prefixes,pid,property):
 
     return df, map_features
 def process_df_col_to_markdown(df,colname):
-    """Returns a string representation of a column as a markdown list"""
+    """Converts a specific DataFrame column into a formatted Markdown list.
+
+    Args:
+        df (pd.DataFrame): The source DataFrame.
+        colname (str): The column to transform into a list (and name to display as the list heading).
+
+    Returns:
+        str: A Markdown string with a header and bulleted items.
+    """
+
     list = "\n".join([f"* {x}" for x in df[colname]])
     markdown_output = f"""## {colname}
         \n{list}"""
