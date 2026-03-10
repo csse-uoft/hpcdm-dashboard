@@ -21,4 +21,4 @@ Running the container:
 sudo docker run -d -p 7860:7860 --name demo_container --restart unless-stopped dashboard_img
 
 ## Documentation
-See Docs.md for more details.
+See [the documentation](https://github.com/csse-uoft/hpcdm-dashboard/wiki/Documentation) for more details.
