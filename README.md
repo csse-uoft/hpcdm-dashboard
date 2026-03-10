@@ -22,13 +22,14 @@ gradio-dashboard/
 └── Dockerfile
 
 
-### environment variables
-* SPARQL_ENDPOINT=http://compass.project.urbandatacentre.ca/repositories/CDT_Rules
-* passing through docker vs in .env
+
 
 ### docker
+Environment variables (currently only the SPARQL_ENDPOINT) may be defined in a separate .env or passed through the docker build
+* SPARQL_ENDPOINT=http://compass.project.urbandatacentre.ca/repositories/CDT_Rules
+
 Building the container, run in the folder (hpcdm-dashboard):
 sudo docker build --progress=plain -t dashboard_img .
 
 Running the container:
-sudo docker run -d -p 7860:7860 --name demo_container dashboard_img
+sudo docker run -d -p 7860:7860 --name demo_container --restart unless-stopped dashboard_img
