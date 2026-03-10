@@ -107,7 +107,7 @@ def hex_to_rgb_array(h):
     """Converts a hex color string to a NumPy RGB array.
 
     Args:
-        h (str): Hex color code (e.g., '#FF5733').
+        h (str): Hex color code (e.g., `#FF5733`).
 
     Returns:
         np.ndarray: Array of [R, G, B] values.

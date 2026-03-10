@@ -129,5 +129,6 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
         inputs = [query_dropdown,secondary_drp,endpoint_state,prefix_state,selected_parcel_uri,base_map_state],
         outputs = [results_table,map_plot]
     )
-#demo.launch(server_name="0.0.0.0", server_port=7860, share=True)
-demo.launch()
+    if __name__ == "__main__":
+        #demo.launch(server_name="0.0.0.0", server_port=7860, share=True)
+        demo.launch()

@@ -1,0 +1,14 @@
+# pydoc-markdown.yml
+loaders:
+  - type: python
+    search_path: ["."]
+    modules: ["app_demo", "src.utils", "src.sparql_client", "src.ui_components"]
+
+renderer:
+  type: markdown
+  render_toc: true
+  # This is the magic part for GitHub links
+  source_linker:
+    type: github
+    repo: "csse-uoft/hpcdm-dashboard"
+#    ref_prefix: "main" 
