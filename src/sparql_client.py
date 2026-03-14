@@ -17,6 +17,8 @@ Todo:
 """
 
 from SPARQLWrapper import SPARQLWrapper, JSON
+import socket
+from urllib.error import URLError 
 import pandas as pd
 import gradio as gr
 def fetch_parcel_attributes(endpoint,prefixes,pid):
@@ -537,6 +539,45 @@ SELECT DISTINCT ?current_use WHERE {{
         df.loc[0] = "unknown" 
     return df
 
+def fetch_zoning_avg(endpoint,prefixes):
+    """Retrieves the average values for any attributes defined for the parcel.
+    Todo: complete doc"""
+    query_vars = ['att', 'avg_label', 'u', 'u_label', 'avg']
+    query = f"""
+    {prefixes}
+    SELECT ?ctlabel ?avg_label ?u_label (AVG(?limit) AS ?avg)
+        WHERE {{
+            # Regulations defined in law
+            ?reg hp:definedIn ?source.
+            ?source a hp:ZoningBylaw.
+            
+            # The regulation that designates the zoning type for an area
+            ?reg a hp:Regulation;
+                hp:specifiesConstraint ?c.
+            
+            ?c i72:hasValue ?v;
+            hp:constrains [ i72:parameter_of_var [i72:hasName ?cp];
+                            i72:description_of ?p ];
+            rdf:type ?constraint_type.
+            
+            # Constraint value
+            ?v i72:hasNumericalValue ?limit.
+            
+            OPTIONAL {{ ?v i72:hasUnit [rdfs:label ?u_label] }}
+            
+            # Property label
+            OPTIONAL {{ ?cp rdfs:label ?avg_label }}
+            FILTER (?limit >=0) #ignore zoning with no limit
+        }}
+        GROUP BY ?ctlabel ?avg_label ?u_label
+    """
+    #run sparql query; convert to table
+    df = run_sparql_to_data(query, endpoint,query_vars)
+    #if there are no query results, return "Unknown"
+    if df.empty:
+        df.loc[0] = "unknown" 
+    return df
+
 #transformation of query results for display
 def run_sparql_to_data(query, endpoint, columns):
     """Executes a SPARQL query and converts the JSON results to a pandas DataFrame.
@@ -553,12 +594,12 @@ def run_sparql_to_data(query, endpoint, columns):
         pd.DataFrame: The processed results. Returns an empty DataFrame on error.
     """
 
-    #if not pid:
-    #    return pd.DataFrame(columns=columns)
-
+    #timeout
+    timeout_limit = 60
     sparql = SPARQLWrapper(endpoint)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
+    sparql.setTimeout(timeout_limit)
 
     try:
         results = sparql.query().convert()
@@ -586,8 +627,14 @@ def run_sparql_to_data(query, endpoint, columns):
         df = df.convert_dtypes()
 
         return df
-
+    except socket.timeout:
+        raise gr.Error("Query Timed Out: The SPARQL endpoint is currently busy. Please try again in a moment.")
+    except URLError as e:
+        # URLError often wraps a timeout, so we check the reason
+        if isinstance(e.reason, socket.timeout):
+            raise gr.Error("Query Timed Out: The SPARQL endpoint is currently busy. Please try again in a moment.")
+        return f"Network Error: {str(e.reason)}"
     except Exception as e:
-        print(f"SPARQL Error: {e}")
+        print(f"Query Error: {e}")
         return pd.DataFrame(columns=columns)
     

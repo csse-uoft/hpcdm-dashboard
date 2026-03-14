@@ -1,3 +1,5 @@
+#run in folder pydoc-markdown > docs.md 
+#creates the content for the documentation wiki
 # pydoc-markdown.yml
 loaders:
   - type: python

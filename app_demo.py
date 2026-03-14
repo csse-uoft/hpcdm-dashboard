@@ -65,9 +65,53 @@ PREFIX tor: <http://ontology.eil.utoronto.ca/Toronto/Toronto#>
 PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>
 """
 
+# Custom CSS to style the info-bar class and city average metric cards
+custom_css = """
+.info-bar {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ffeeba;
+    margin-bottom: 20px;
+    text-align: left;
+}
+.metric-card {
+    border: 1px solid var(--border-color-primary);
+    padding: 12px 16px;
+    border-radius: var(--container-radius);
+    background: var(--background-fill-secondary);
+    min-width: 160px;
+    flex: 1 1 calc(33.333% - 12px); /* Three cards per row, adjustable */
+    box-shadow: var(--shadow-drop);
+}
+
+.metric-label {
+    margin: 0 !important;
+    font-size: 0.85rem !important;
+    color: var(--body-text-color-subdued) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.metric-value {
+    margin: 4px 0 0 0 !important;
+    font-size: 1.4rem !important;
+    font-weight: 600 !important;
+    color: var(--body-text-color) !important;
+}
+
+.metric-unit {
+    font-size: 0.9rem;
+    font-weight: normal;
+    margin-left: 4px;
+    color: var(--body-text-color-subdued);
+}
+"""
 
 # --- UI Setup ---
 with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
+
     """Defines the Gradio Blocks layout and event-driven logic.
     
     The UI is split into two main sections:
@@ -75,6 +119,15 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
     2. Advanced Queries: Iterative data retrieval for zoning, services, 
        and demographics.
     """
+    # Applying the custom 'info-bar' class to the Markdown component
+    gr.Markdown(
+        """
+        <div class="info-bar">
+            <strong>Beta Version:</strong> This tool queries a live, shared SPARQL endpoint, currently limited to sequential request processing.
+            prevent system-wide delays, queries are processed one at a time and will automatically timeout after 30 seconds.
+        """
+    )
+    
     # --- Hidden State ---
     # Used to store variables for context across interactions
     selected_parcel_uri = gr.State("")  #parcel id
@@ -89,12 +142,12 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
             selected_parcel_uri = gr.Textbox(label="Detected Parcel ID(s)", interactive=False)
             res_status = gr.Textbox(label="Verification", interactive=False)
             with gr.Accordion("View SPARQL Query", open=False):
-                query_display = gr.Code(language="sql")
+                query_display = gr.Code(language=None)
         with gr.Column(scale=2):
             map_plot = gr.Plot(label="Map View")
     #parcel attribute view
     gr.Markdown("---")
-    gr.Markdown("### 🛠️ Advanced Queries")
+    gr.Markdown("### Advanced Queries")
     query_dropdown = gr.Dropdown(
         choices=["Select...", "Parcel Attributes", "Available Services", "Applicable Zoning","Land Use", "Neighbourhood Demographics", "Zoning Compliance"],
         label="Choose a query to run on this parcel",
@@ -105,23 +158,27 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
     # This shows the text updates from the router
     #status_update = gr.Textbox(label="Query Status", interactive=False)
     # --- Results Table ---
-    results_table = gr.Dataframe(interactive=False, visible=False)
-    # --- Results Listing (columns) ---
-    with gr.Row():
-        # Column 1: Markdown list
-        col1_output = gr.Markdown(visible=False)
-        # Column 2: Single value
-        col2_output = gr.Markdown(visible=False)
-    # --- GraphDB visual graph ---
+    with gr.Column(scale=3):    #parcel-specific results
+        results_table = gr.Dataframe(interactive=False, visible=False,  buttons=["copy", "fullscreen"])
+        # --- Results Listing (columns) ---
+        with gr.Row():
+            # Column 1: Markdown list
+            col1_output = gr.Markdown(visible=False)
+            # Column 2: Single value
+            col2_output = gr.Markdown(visible=False)
+        # --- GraphDB visual graph ---
+    with gr.Column(scale=1):    #averages for context
+        # Use small labels for the most important averages
+        city_avg = gr.HTML(visible=False,label="Toronto Averages")
     # This component will render the interactive graph
-    graph_output = gr.HTML(label="Visual Graph")
+    graph_output = gr.HTML(visible=False,label="Visual Graph")
 #event logic        
     search_btn.click(fn=process_address, inputs=[endpoint_state,addr_input], outputs=[selected_parcel_uri, res_status, query_display, map_plot, base_map_state])
     # Dropdown change triggers the specific query logic
     query_dropdown.change(
         fn=query_router,
         inputs=[query_dropdown, endpoint_state, prefix_state, selected_parcel_uri, base_map_state],
-        outputs=[results_table, map_plot, col1_output, col2_output,secondary_drp,graph_output]
+        outputs=[results_table, city_avg, map_plot, col1_output, col2_output,secondary_drp,graph_output]
     )
     #Secondary dropdown triggers additional logic
     secondary_drp.change(
@@ -130,5 +187,6 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
         outputs = [results_table,map_plot]
     )
     if __name__ == "__main__":
+        demo.queue()
         #demo.launch(server_name="0.0.0.0", server_port=7860, share=True)
-        demo.launch()
+        demo.launch(css=custom_css)

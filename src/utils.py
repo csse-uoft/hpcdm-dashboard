@@ -151,13 +151,15 @@ def process_zoning_compliance(endpoint,prefixes,pid,property):
     nearbypcol = df['nearbyp'].str.extract(r'([^/#]+)$', expand=False) # This regex looks for the last / or # and takes everything following it
     df.insert(0,'nearbyp_short',nearbypcol)
     if not df.empty:
+        # This prevents NumPy arrays from "sneaking" into the dictionary
+        df['nearbypwkt'] = df['nearbypwkt'].astype(str)
         # Extract map features 
         # Filter the DataFrame to only include rows with valid WKTs (no NAs)
         valid_wkts = df.dropna(subset=['nearbypwkt']).copy()
 
         # Use a list comprehension to build map_features
         map_features = [
-            {"wkt": row['nearbypwkt'], "label": row['compliancestatus'], "att_label": "Parcel ID", "att_value": row['nearbyp_short']} 
+            {"wkt": str(row['nearbypwkt']).strip(), "label": row['compliancestatus'], "att_label": "Parcel ID", "att_value": row['nearbyp_short']} 
             for _, row in valid_wkts.iterrows()
         ]
         

@@ -25,6 +25,8 @@ import plotly.express as px
 from shapely.geometry import Point
 from shapely import wkt
 from SPARQLWrapper import SPARQLWrapper, JSON
+import socket
+from urllib.error import URLError 
 from src.ui_components import *
 def geocode_logic(address):
     """Translates a string address into geographic coordinates.
@@ -116,13 +118,15 @@ SELECT ?p ?wkt WHERE {{
      loc:hasLocation ?loc .
     ?loc geo:asWKT ?wkt.
     BIND("{wkt_point}"^^geo:wktLiteral AS ?pwkt)
-   ?loc geo:sfIntersects ?pwkt #according to googleAI, graphDB's plugin specifically allows ?feature geo:sfIntersects ?wktLiteral to support "on-the-fly" spatial filtering without requiring you to insert temporary data.
+   ?loc geo:sfIntersects ?pwkt 
 }} LIMIT 5"""
 
     # 2. SPARQL Execution
     sparql = SPARQLWrapper(endpoint)
     sparql.setQuery(query_text)
     sparql.setReturnFormat(JSON)
+    timeout_limit = 35 
+    sparql.setTimeout(timeout_limit)
 
     parcel_uri = "No parcels found."
     fig = go.Figure()
@@ -154,7 +158,13 @@ SELECT ?p ?wkt WHERE {{
                     opacity=0.4,
                     secondary_label = "Parcel ID",
                     secondary_value= f"{parcel_uri_label}")
-                
+    except socket.timeout:
+        raise gr.Error("Query Timed Out: The SPARQL endpoint is currently busy. Please try again in a moment.")
+    except URLError as e:
+        # URLError often wraps a timeout, so we check the reason
+        if isinstance(e.reason, socket.timeout):
+            raise gr.Error("Query Timed Out: The SPARQL endpoint is currently busy. Please try again in a moment.")
+        return f"Network Error: {str(e.reason)}"
     except Exception as e:
         parcel_uri = f"Query Error: {e}"
 

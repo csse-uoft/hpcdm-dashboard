@@ -23,7 +23,7 @@ import plotly.express as px
 from PIL import ImageColor
 from src.sparql_client import *
 from src.utils import *
-def add_wkt_to_fig(fig, wkt_str, name, color='blue', opacity=0.3, show_in_legend=True, group_id=None, secondary_label=None, secondary_value=None):
+def add_wkt_to_fig(fig, wkt_value, name, color='blue', opacity=0.3, show_in_legend=True, group_id=None, secondary_label=None, secondary_value=None):
     """Parses WKT and adds a corresponding trace to a Plotly figure.
 
     Supports Point, MultiPoint, Polygon, and MultiPolygon. Other geometry types 
@@ -41,7 +41,13 @@ def add_wkt_to_fig(fig, wkt_str, name, color='blue', opacity=0.3, show_in_legend
         secondary_label (str, optional): Label for additional hover data.
         secondary_value (any, optional): Value for additional hover data.
     """
+
     try:
+        if isinstance(wkt_value, (list, np.ndarray)):
+        # If it's an array of a single string, extract it
+            wkt_str = str(wkt_value.item()) if hasattr(wkt_value, 'item') else str(wkt_value[0])
+        else:
+            wkt_str = str(wkt_value)
         clean_wkt = wkt_str.split('>')[-1].strip()
         lats = []
         lons = []
@@ -166,13 +172,15 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
     """
     """ Generates the appropriate query and output based on selected_option. """
     #text columns
-    col1=""
-    col2=""
+    col1=gr.update(visible=False)
+    col2=gr.update(visible=False)
     #results summaries
-    results_table=gr.DataFrame(value=None,visible=False)
-    secondary_drp = gr.Dropdown(choices=[],visible=False)
+    results_table=gr.update(value=None,visible=False)
+    html_output=""
+    html_cityavg=gr.update(visible=False)
+    secondary_drp = gr.update(visible=False)
     #GraphDB visual graph html embedding
-    graph_output = ""
+    graph_output = gr.update(value="")
 
     #colour palettes for maps
     # 1. Define the colors you want to avoid, threshold for closeness
@@ -188,11 +196,11 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
     if not parcel_uri:
         headers=[""]
         data = [["No parcel found. Please search for an address first."]]
-        results_table = gr.Dataframe(value=data, headers=headers, visible=True)
+        results_table = gr.update(value=data, visible=True)
     if selected_option == "Select...":
         headers=[""]
         data = [["Please select a query from the list."]]
-        results_table = gr.Dataframe(value=data, headers=headers, visible=True)
+        results_table = gr.update(value=data, visible=True)
 
     try:
         # create a copy of the map to add to it
@@ -209,8 +217,12 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
         data.columns=headers
         #Style values with lower precision
         displaydata = data.style.format(precision=2)
-        results_table = gr.Dataframe(value=displaydata, visible=True)    
-        graph_output = generate_graph_iframe(parcel_uri,"4e4261c482204a5aa7951d08f4b66589") #predefined graphDB visualization config
+        results_table = gr.update(value=displaydata, visible=True)  
+        html_cityavg = gr.update(value=html_output, visible=False)
+        col1=gr.update(visible=False)
+        col2=gr.update(visible=False)
+        #visual graph embedding
+        graph_output = gr.update(value=generate_graph_iframe(parcel_uri,"4e4261c482204a5aa7951d08f4b66589"),visible=True) #predefined graphDB visualization config
     elif selected_option == "Neighbourhood Demographics":
         # Query 2: Returns neighbourhood demographic data
         #list of characteristics to query
@@ -219,7 +231,10 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
         data,map_data = process_neighbourhood_demographics(endpoint,prefixes,parcel_uri,characteristic_list)
         data = data.drop(columns=['neighbourhood_name','unit','cwkt'])
         data.columns = headers
-        results_table = gr.Dataframe(value=data, visible=True)
+        results_table = gr.update(value=data, visible=True)
+        html_cityavg = gr.update(value=html_output, visible=False)
+        col1=gr.update(visible=False)
+        col2=gr.update(visible=False)
         #update the map
         #  Build the color map using the indices of your unique labels
         # Since 'map_data' is already unique, we can use enumerate directly on it
@@ -254,8 +269,10 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
         data.columns=headers
         #Style values with lower precision
         displaydata = data.style.format(precision=2)
-        results_table = gr.Dataframe(value=displaydata, visible=True)     
-
+        results_table = gr.update(value=displaydata, visible=True)     
+        html_cityavg = gr.update(value=html_output, visible=False)
+        col1=gr.update(visible=False)
+        col2=gr.update(visible=False)
         # For service points on the map
         # Count occurrences of each service type
         from collections import Counter
@@ -306,8 +323,12 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
         data.columns=headers
         #Style values with lower precision
         displaydata = data.style.format(precision=2)
-        results_table = gr.Dataframe(value=displaydata, visible=True, label="Note: zones adjacent to the parcel (if any) are returned for context.")
-
+        results_table = gr.update(value=displaydata, visible=True, label="Note: zones adjacent to the parcel (if any) are returned for context.")
+        #contextual data
+        #html_output = format_context_cards(fetch_zoning_avg(endpoint,prefixes))
+        #html_cityavg = gr.update(value=html_output, visible=True)
+        col1=gr.update(visible=False)
+        col2=gr.update(visible=False)
         #update map
         # For regulation areas on the map
         # Count occurrences of each zone
@@ -357,17 +378,21 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
         header2="Current Use"
         data2.columns=[header2]
         col2value = process_df_col_to_markdown(data2,header2)
-        col1 = gr.Markdown(value = col1value, visible=True)
-        col2 = gr.Markdown(value = col2value, visible=True)
-
+        col1 = gr.update(value = col1value, visible=True)
+        col2 = gr.update(value = col2value, visible=True)
+        html_cityavg = gr.update(value=html_output, visible=False)
+        results_table=gr.update(visible=False)
     elif selected_option == "Zoning Compliance":
         #get property labels and uris constrained by zoning
         choices = process_compliance_properties(endpoint,prefixes)
         manual_option = [("Select a property...", "NONE_SELECTED")]
         choices = manual_option + choices
-        secondary_drp = gr.Dropdown(choices,visible=True, value="NONE_SELECTED")
-        results_table = gr.Dataframe(value=None, visible=False)
-    return results_table, current_fig, col1, col2, secondary_drp,graph_output
+        secondary_drp = gr.update(choices=choices, visible=True, value="NONE_SELECTED")
+        results_table = gr.update(value=None, visible=False)
+        html_cityavg = gr.update(value=html_output, visible=False)
+        col1=gr.update(visible=False)
+        col2=gr.update(visible=False)        
+    return results_table, html_cityavg, current_fig, col1, col2, secondary_drp, graph_output
 
 def secondary_router(first_selected_option, selected_option,endpoint, prefixes, parcel_uri,current_fig,progress=gr.Progress()):
     """Handles multi-step queries (e.g., specific property compliance).
@@ -386,7 +411,7 @@ def secondary_router(first_selected_option, selected_option,endpoint, prefixes, 
     Returns:
         tuple: (results_table, updated_fig)
     """
-    results_table=gr.DataFrame()
+    results_table=gr.update(value=None,visible=False)
     # Manually unpack Gradio's PlotData object (to create a copy of the map so that we can add to it)
     try:
         #create a copy to add features to
@@ -397,40 +422,39 @@ def secondary_router(first_selected_option, selected_option,endpoint, prefixes, 
         new_fig = go.Figure()
     #colour palettes for maps
     # 1. Define the colors you want to avoid, threshold for closeness
-    threshold = 60 # Increase this to be more "aggressive" with exclusions
     banned_colors = ["#FF0000"]  # Red (this is used for the parcel)
-    # 2. Grab the full palette and filter it
+    # 1. Get the palette as strings (Match Query Router)
     full_palette = px.colors.qualitative.Plotly
     clean_hex_palette = [
         c for c in full_palette 
-        if not is_near_any_banned(c, banned_colors, threshold)
+        if not is_near_any_banned(c, banned_colors, threshold=80) # Use 80 consistently
     ]
-    # 3. Convert the entire palette to RGB tuples once
-    rgb_palette = [clean_hex_palette(c) for c in clean_hex_palette]
 
     if selected_option == "NONE_SELECTED":
         headers=[""]
         data = [["Please select a query from the list."]]
-        results_table = gr.Dataframe(value=data, headers=headers, visible=True)
+        results_table = gr.update(value=data, headers=headers, visible=True)
     elif not parcel_uri:
         headers=[""]
         data = [["No parcel found. Please search for an address first."]]
-        results_table = gr.Dataframe(value=data, headers=headers, visible=True)
+        results_table = gr.update(value=data, headers=headers, visible=True)
     elif first_selected_option == "Zoning Compliance":    #the logic for zoning compliance, other multi-part queries will be different
         headers = ["Nearby Parcel", "Regulation", "Constraint Type", "Limit", "Unit", "Actual Value", "Regulation Compliant?"]
         data,map_data = process_zoning_compliance(endpoint,prefixes,parcel_uri,selected_option)
         data = data.drop(columns=['nearbyp','nearbypwkt','actualunit'])
         data.columns = headers
-        results_table = gr.Dataframe(value=data, visible=True)
+        results_table = gr.update(value=data, visible=True)
         #update the map
         # For parcels on the map
         # Count occurrences of each status (compliance) type
         from collections import Counter
         counts = Counter([item['label'] for item in map_data])
-        # Map each unique label type to a color
+        # 2. Build the color map using strings
         unique_status = list(counts.keys())
-        color_map = {srv: rgb_palette[i % len(rgb_palette)] for i, srv in enumerate(unique_status)}
-
+        color_map = {
+            srv: clean_hex_palette[i % len(clean_hex_palette)] 
+            for i, srv in enumerate(unique_status)
+        }
         #add new map points for parcels, don't display an additional legend element if it's already been listed
         legend_tracker = set()
         for item in map_data:
@@ -494,3 +518,35 @@ def generate_graph_iframe(pid, configid, host="compass.project.urbandatacentre.c
     print(f"Embedded url: {embedded_url}")
     # 3. Return the HTML iframe component
     return f'<iframe src="{embedded_url}" width="100%" height="600px" style="border:none;"></iframe>'
+
+def format_context_cards(df):
+    """Formats a pandas dataframe (via sparql query results) into html content suitable for presentation in the city averages view.
+    Todo: documentation"""
+    if df is None or df.empty:
+        return "<p style='color: gray;'>No contextual data available for this area.</p>"
+    
+    # Start the container with Flexbox for wrapping
+    html_content = '<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">'
+    
+    for _, row in df.iterrows():
+        # Adjust these keys based on your specific DataFrame column names
+        label = row.get('avg_label',"")
+        value = row.get('avg',0)
+        try:
+            value_str = f"{float(value):,.2f}"
+        except Exception:
+            value_str = str(value)
+        unit = row.get('u_label', "")
+        
+        # Handle potential NaN units
+        unit_str = f" {unit}" if pd.notna(unit) and unit != "" else ""
+        
+        html_content += f"""
+        <div class="metric-card">
+            <p class="metric-label">{label}</p>
+            <p class="metric-value">{value_str}<span class="metric-unit">{unit_str}</span></p>
+        </div>
+        """
+    
+    html_content += '</div>'
+    return html_content
