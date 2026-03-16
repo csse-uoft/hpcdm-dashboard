@@ -207,13 +207,12 @@ SELECT ?servicelabel ?servicename ?cap_type ?cap_avail ?cap_unit ?swkt WHERE {{
     ?s a <{servicetype}>;
     	a hp:Service.
     <{servicetype}> rdfs:label ?servicelabel.
-    #service site location, if defined
+    #service site name, if defined
     OPTIONAL {{
         ?s hp:providedFromSite ?site.		
-    ?site loc:hasLocation ?sloc.
-    ?sloc geo:asWKT ?swkt.
     ?site genprop:hasName ?servicename.}}
-    
+    #TBD instead of showing site location (may not exist) return catchment area as swkt?
+
     #service capacity
     ?s res:hasAvailableCapacity ?cap.
     ?cap i72:hasValue [i72:hasNumericalValue ?cap_avail;
