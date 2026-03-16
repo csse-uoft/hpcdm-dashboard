@@ -150,7 +150,7 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="red")) as demo:
             map_plot = gr.Plot(label="Map View")
     #parcel attribute view
     gr.Markdown("---")
-    gr.Markdown("### Advanced Queries")
+    gr.Markdown("### Parcel Queries")
     query_dropdown = gr.Dropdown(
         choices=["Select...", "Parcel Attributes", "Available Services", "Applicable Zoning","Land Use", "Neighbourhood Demographics", "Zoning Compliance"],
         label="Choose a query to run on this parcel",

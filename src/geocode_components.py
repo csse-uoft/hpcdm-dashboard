@@ -119,7 +119,7 @@ SELECT ?p ?wkt WHERE {{
     ?loc geo:asWKT ?wkt.
     BIND("{wkt_point}"^^geo:wktLiteral AS ?pwkt)
    ?loc geo:sfIntersects ?pwkt 
-}} LIMIT 5"""
+}} LIMIT 1"""
 
     # 2. SPARQL Execution
     sparql = SPARQLWrapper(endpoint)

@@ -479,7 +479,7 @@ def fetch_zoning_compliance(endpoint,prefixes,pid,property):
         )
         )
     ),
-    "unknown" # This is the final safety net if the IF logic crashes
+    "unknown" # A safety net if the IF logic crashes
     ) AS ?compliancestatus)
 }}
     """
