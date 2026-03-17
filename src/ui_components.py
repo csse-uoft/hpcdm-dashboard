@@ -266,8 +266,8 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
         data = data.drop(columns=['swkt'])
         #Set new headers for display
         data.columns=headers
-        #Style values with lower precision
-        displaydata = data.style.format(precision=2)
+        #Style values with limited precision (need at least 4 for capacity measures on the order of 1/1000 per capita)
+        displaydata = data.style.format(precision=4)
         results_table = gr.Dataframe(value=displaydata, visible=True)
          #contextual data
         html_output = format_context_cards(avg_data)
@@ -525,7 +525,7 @@ def format_context_cards(df):
         label = row.get('avg_label',"")
         value = row.get('avg',0)
         try:
-            value_str = f"{float(value):,.2f}"
+            value_str = f"{float(value):,.4f}"
         except Exception:
             value_str = str(value)
         unit = row.get('u_label', "")
