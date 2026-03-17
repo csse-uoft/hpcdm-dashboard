@@ -43,10 +43,14 @@ def process_service_data(endpoint,prefixes,pid,progress=gr.Progress()):
     for i, row in class_names.iterrows():
         try:
             servicetype = row['servicetype'] # Get the actual URI string
+            #debug
+            #print(servicetype)
             # Run a second query using both the parcel URI and the specific class name
             progress((i + 1) / len(class_names), desc=f"Querying Service: {servicetype}")
             service_df = fetch_service_data(endpoint,prefixes,pid,servicetype)
             service_avg_df = fetch_service_avg(endpoint,prefixes,pid,servicetype)
+            #debug
+            #print(service_avg_df)
             new_features = []
             if not service_df.empty:
                 # Extract map features before we modify the DF
@@ -61,15 +65,18 @@ def process_service_data(endpoint,prefixes,pid,progress=gr.Progress()):
                 ]
 
                 all_dfs.append(service_df)
-                all_avg_dfs.append(service_avg_df)
                 # Append the new batch to your master list
                 map_features.extend(new_features)
+            if not service_avg_df.empty:
+                all_avg_dfs.append(service_avg_df)
+                
         except Exception as e:
             print(f"Loop Error for {servicetype}: {e}")
             continue
     #initialize dataframe
     final_df = pd.DataFrame()
     final_avg_df = pd.DataFrame()
+    print(all_avg_dfs)
     # Final Aggregation
     if all_dfs:
         # Combine all service DataFrames into one

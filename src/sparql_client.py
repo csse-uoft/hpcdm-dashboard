@@ -256,7 +256,8 @@ UNION
     																i72:hasUnit i72:metre]].
 
 	#(shortest) distance between the edge of the parcel and the service network 
-	BIND(geof:distance(?pwkt, ?swkt, uom:metre) AS ?distance)
+    #skip errors
+BIND(COALESCE(geof:distance(?pwkt, ?swkt, uom:metre), "Error") AS ?distance)
 	#limit distance to within the defined service radius
 	FILTER (?distance <= ?max_d)
 	

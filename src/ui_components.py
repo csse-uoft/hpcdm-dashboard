@@ -197,6 +197,7 @@ def query_router(selected_option, endpoint, prefixes, parcel_uri,current_fig,pro
         headers=[""]
         data = [["No parcel found. Please search for an address first."]]
         results_table = gr.update(value=data, visible=True)
+        return results_table, html_cityavg, current_fig, col1, col2, secondary_drp
     if selected_option == "Select...":
         headers=[""]
         data = [["Please select a query from the list."]]
