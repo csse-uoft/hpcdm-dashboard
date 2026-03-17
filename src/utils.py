@@ -49,15 +49,14 @@ def process_service_data(endpoint,prefixes,pid,progress=gr.Progress()):
             progress((i + 1) / len(class_names), desc=f"Querying Service: {servicetype}")
             service_df = fetch_service_data(endpoint,prefixes,pid,servicetype)
             service_avg_df = fetch_service_avg(endpoint,prefixes,pid,servicetype)
-            #debug
-            #print(service_avg_df)
+  
             new_features = []
             if not service_df.empty:
                 # Extract map features before we modify the DF
                 # Filter the DataFrame to only include rows with valid WKTs
                 valid_wkts = service_df[service_df['swkt'].notna() & (service_df['swkt'] != '-')]
                 
-                # Use a list comprehension to build map_features instantly
+                # Use a list comprehension to build map_features 
                 #include the service name for use as a hover label
                 new_features = [
                     {"wkt": row['swkt'], "label": row['servicelabel'], "servicename": row['servicename']} 
@@ -65,7 +64,7 @@ def process_service_data(endpoint,prefixes,pid,progress=gr.Progress()):
                 ]
 
                 all_dfs.append(service_df)
-                # Append the new batch to your master list
+                # Append the new batch to the master list
                 map_features.extend(new_features)
             if not service_avg_df.empty:
                 all_avg_dfs.append(service_avg_df)
@@ -76,7 +75,7 @@ def process_service_data(endpoint,prefixes,pid,progress=gr.Progress()):
     #initialize dataframe
     final_df = pd.DataFrame()
     final_avg_df = pd.DataFrame()
-    print(all_avg_dfs)
+
     # Final Aggregation
     if all_dfs:
         # Combine all service DataFrames into one

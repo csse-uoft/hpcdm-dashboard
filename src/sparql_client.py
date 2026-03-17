@@ -219,7 +219,7 @@ SELECT ?servicelabel ?servicename ?cap_type ?cap_avail ?cap_unit ?swkt WHERE {{
        									i72:hasUnit ?u];
     					rdf:type ?cap_type_class.
 	?cap_type_class rdfs:label ?cap_type.
-    ?u rdfs:label ?cap_unit.
+    OPTIONAL {{?u rdfs:label ?cap_unit.}} #weaken unit label filter
     # Filter out the "Generics" (owl:Thing and owl:Nothing)
     FILTER(?cap_type_class != owl:Thing && ?cap_type_class != owl:Nothing)
     FILTER(!isBlank(?cap_type_class))
@@ -266,7 +266,7 @@ BIND(COALESCE(geof:distance(?pwkt, ?swkt, uom:metre), "Error") AS ?distance)
     ?cap i72:hasValue [i72:hasNumericalValue ?cap_avail;
        									i72:hasUnit ?u];
     					rdf:type ?cap_type_class.
-    ?u rdfs:label ?cap_unit.
+    OPTIONAL {{?u rdfs:label ?cap_unit.}} #weaken unit label filter
 	?cap_type_class rdfs:label ?cap_type.
     # Filter out the "Generics" (owl:Thing and owl:Nothing)
     FILTER(?cap_type_class != owl:Thing && ?cap_type_class != owl:Nothing)

@@ -87,6 +87,23 @@ def add_wkt_to_fig(fig, wkt_value, name, color='blue', opacity=0.3, show_in_lege
                 customdata=custom_data_wrapped,
                 hovertemplate=f"<b>%{{customdata[0]}}</b>: %{{customdata[1]}}<extra></extra>"
             ))
+        #for lines
+        elif geom.geom_type in ['MultiLineString', 'LineString']:
+            # Standardize to a list of geometry objects
+            geoms = geom.geoms if geom.geom_type == 'MultiLineString' else [geom]
+            
+            for g in geoms:
+                lons, lats = g.xy
+                custom_data_wrapped = [[secondary_label, secondary_value]] * len(lons)
+                fig.add_trace(go.Scattermap(
+                    mode="lines",
+                    lon=list(lons),
+                    lat=list(lats),
+                    line=dict(width=2, color=color),
+                    **legend_args,
+                    customdata=custom_data_wrapped,
+                    hovertemplate=f"<b>%{{customdata[0]}}</b>: %{{customdata[1]}}<extra></extra>"
+                ))
         # Handle Polygons
         elif geom.geom_type in ['Polygon', 'MultiPolygon']:
             geoms = geom.geoms if geom.geom_type == 'MultiPolygon' else [geom]
