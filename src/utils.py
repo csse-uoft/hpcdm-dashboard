@@ -177,21 +177,6 @@ def process_zoning_compliance(endpoint,prefixes,pid,property):
         
 
     return df, map_features
-def process_df_col_to_markdown(df,colname):
-    """Converts a specific DataFrame column into a formatted Markdown list.
-
-    Args:
-        df (pd.DataFrame): The source DataFrame.
-        colname (str): The column to transform into a list (and name to display as the list heading).
-
-    Returns:
-        str: A Markdown string with a header and bulleted items.
-    """
-
-    list = "\n".join([f"* {x}" for x in df[colname]])
-    markdown_output = f"""## {colname}
-        \n{list}"""
-    return markdown_output
 
 def process_df_col_to_markdown_chips(df, column_name):
     """Converts a DataFrame column into a stylized Markdown string of HTML 'chips'.

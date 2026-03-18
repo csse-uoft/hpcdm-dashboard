@@ -1,0 +1,404 @@
+@prefix : <http://ontology.eil.utoronto.ca/Toronto/Toronto#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@base <http://ontology.eil.utoronto.ca/Toronto/Toronto#> .
+
+<http://ontology.eil.utoronto.ca/Toronto/Toronto#> rdf:type owl:Ontology ;
+                                                    owl:imports <http://ontology.eil.utoronto.ca/HPCDM/> ;
+                                                    <http://purl.org/dc/elements/1.1/title> "Toronto Housing Potential Common Data Model" ;
+                                                    <http://purl.org/dc/terms/description> "Toronto implementation of the HPCDM. Includes some extensions and specializations as needed to support the implementation." .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue
+<http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> rdf:type owl:AnnotationProperty .
+
+
+###  http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit
+<http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> rdf:type owl:AnnotationProperty .
+
+
+###  http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue
+<http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/created
+<http://purl.org/dc/terms/created> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/creator
+<http://purl.org/dc/terms/creator> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/description
+<http://purl.org/dc/terms/description> rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorChildcareService
+:TorChildcareService rdf:type owl:Class ;
+                     rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/ChildcareService> ,
+                                     :TorontoService ,
+                                     [ rdf:type owl:Restriction ;
+                                       owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                       owl:hasValue :childcare_service_radius_default
+                                     ] ;
+                     rdfs:label "Childcare" ;
+                     skos:altLabel "Childcare service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorCommunityCentreService
+:TorCommunityCentreService rdf:type owl:Class ;
+                           rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/CommunityCentreService> ,
+                                           :TorontoService ,
+                                           [ rdf:type owl:Restriction ;
+                                             owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                             owl:hasValue :community_centre_service_radius_default
+                                           ] ;
+                           rdfs:label "Community centre" ;
+                           skos:altLabel "Community centre service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorElectricService
+:TorElectricService rdf:type owl:Class ;
+                    rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/ElectricService> ,
+                                    :TorontoService ;
+                    rdfs:label "Electricity" ;
+                    skos:altLabel "Electric service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorFireEmergencyService
+:TorFireEmergencyService rdf:type owl:Class ;
+                         rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/FireEmergencyService> ,
+                                         :TorontoService ;
+                         rdfs:label "Fire emergency" ;
+                         skos:altLabel "Fire emergency service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorHospitalEmergencyService
+:TorHospitalEmergencyService rdf:type owl:Class ;
+                             rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/HospitalEmergencyService> ,
+                                             :TorontoService ,
+                                             [ rdf:type owl:Restriction ;
+                                               owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                               owl:hasValue :hospital_emerg_service_radius_default
+                                             ] ;
+                             rdfs:label "Hospital emergency" ;
+                             skos:altLabel "Hospital emergency service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorHospitalService
+:TorHospitalService rdf:type owl:Class ;
+                    rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/HospitalService> ,
+                                    :TorontoService ,
+                                    [ rdf:type owl:Restriction ;
+                                      owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                      owl:hasValue :hospital_service_radius_default
+                                    ] ;
+                    rdfs:label "Hospital" ;
+                    skos:altLabel "Hospital service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorLibraryService
+:TorLibraryService rdf:type owl:Class ;
+                   rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/LibraryService> ,
+                                   :TorontoService ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                     owl:hasValue :library_service_radius_default
+                                   ] ;
+                   rdfs:label "Library" ;
+                   skos:altLabel "Library service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorLongTermCareService
+:TorLongTermCareService rdf:type owl:Class ;
+                        rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/LongTermCareService> ,
+                                        :TorontoService ,
+                                        [ rdf:type owl:Restriction ;
+                                          owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                          owl:hasValue :ltcare_service_radius_default
+                                        ] ;
+                        rdfs:label "Long-term care" ;
+                        skos:altLabel "Long-term care service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorParkService
+:TorParkService rdf:type owl:Class ;
+                rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/ParkService> ,
+                                :TorontoService ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                  owl:hasValue :park_service_radius_default
+                                ] ;
+                rdfs:label "Park" ;
+                skos:altLabel "Park service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorPublicTransitService
+:TorPublicTransitService rdf:type owl:Class ;
+                         rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/PublicTransitService> ,
+                                         :TorontoService ,
+                                         [ rdf:type owl:Restriction ;
+                                           owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                           owl:hasValue :transit_service_radius_default
+                                         ] ;
+                         rdfs:label "Public transit" ;
+                         skos:altLabel "Public transit service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorSchoolService
+:TorSchoolService rdf:type owl:Class ;
+                  rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/SchoolService> ,
+                                  :TorontoService ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                    owl:hasValue :school_service_radius_default
+                                  ] ;
+                  rdfs:label "School" ;
+                  skos:altLabel "School service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorSolidWasteService
+:TorSolidWasteService rdf:type owl:Class ;
+                      rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/SolidWasteService> ,
+                                      :TorontoService ;
+                      rdfs:label "Solid waste" ;
+                      skos:altLabel "Solid waste service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorSupermarketService
+:TorSupermarketService rdf:type owl:Class ;
+                       rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/SupermarketService> ,
+                                       :TorontoService ,
+                                       [ rdf:type owl:Restriction ;
+                                         owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                         owl:hasValue :supermarket_service_radius_default
+                                       ] ;
+                       rdfs:label "Supermarket" ;
+                       skos:altLabel "Supermarket service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorTransportationNetworkService
+:TorTransportationNetworkService rdf:type owl:Class ;
+                                 rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/TransportationNetworkService> ,
+                                                 :TorontoService ,
+                                                 [ rdf:type owl:Restriction ;
+                                                   owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                                   owl:hasValue :transportnet_service_radius_default
+                                                 ] ;
+                                 rdfs:label "Transportation network" ;
+                                 skos:altLabel "Transportation network service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorWastewaterService
+:TorWastewaterService rdf:type owl:Class ;
+                      rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/WastewaterService> ,
+                                      :TorontoService ,
+                                      [ rdf:type owl:Restriction ;
+                                        owl:onProperty <http://ontology.eil.utoronto.ca/HPCDM/hasServiceRadius> ;
+                                        owl:hasValue :wastewater_service_radius_default
+                                      ] ;
+                      rdfs:label "Wastewater" ;
+                      skos:altLabel "Wastewater service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorWaterService
+:TorWaterService rdf:type owl:Class ;
+                 rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/WaterService> ,
+                                 :TorontoService ;
+                 rdfs:label "Water" ;
+                 skos:altLabel "Water service" .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorontoHPCDMThing
+:TorontoHPCDMThing rdf:type owl:Class .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#TorontoService
+:TorontoService rdf:type owl:Class ;
+                rdfs:subClassOf <http://ontology.eil.utoronto.ca/HPCDM/Service> ,
+                                :TorontoHPCDMThing .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#childcare_service_radius_default
+:childcare_service_radius_default rdf:type owl:NamedIndividual ,
+                                           <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                  <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :childcare_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#childcare_service_radius_measure
+:childcare_service_radius_measure rdf:type owl:NamedIndividual ;
+                                  <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                  <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 1000 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#community_centre_service_radius_default
+:community_centre_service_radius_default rdf:type owl:NamedIndividual ,
+                                                  <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                         <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :community_centre_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#community_centre_service_radius_measure
+:community_centre_service_radius_measure rdf:type owl:NamedIndividual ;
+                                         <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                         <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 400 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#hospital_emerg_service_radius_default
+:hospital_emerg_service_radius_default rdf:type owl:NamedIndividual ,
+                                                <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                       <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :hospital_emerg_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#hospital_emerg_service_radius_measure
+:hospital_emerg_service_radius_measure rdf:type owl:NamedIndividual ;
+                                       <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                       <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 4000 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#hospital_service_radius_default
+:hospital_service_radius_default rdf:type owl:NamedIndividual ,
+                                          <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                 <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :hospital_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#hospital_service_radius_measure
+:hospital_service_radius_measure rdf:type owl:NamedIndividual ;
+                                 <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                 <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 4000 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#library_service_radius_default
+:library_service_radius_default rdf:type owl:NamedIndividual ,
+                                         <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :library_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#library_service_radius_measure
+:library_service_radius_measure rdf:type owl:NamedIndividual ;
+                                <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 400 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#ltcare_service_radius_default
+:ltcare_service_radius_default rdf:type owl:NamedIndividual ,
+                                        <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                               <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :ltcare_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#ltcare_service_radius_measure
+:ltcare_service_radius_measure rdf:type owl:NamedIndividual ;
+                               <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                               <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 400 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#park_service_radius_default
+:park_service_radius_default rdf:type owl:NamedIndividual ,
+                                      <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                             <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :park_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#park_service_radius_measure
+:park_service_radius_measure rdf:type owl:NamedIndividual ;
+                             <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                             <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 1000 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#school_service_radius_default
+:school_service_radius_default rdf:type owl:NamedIndividual ,
+                                        <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                               <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :school_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#school_service_radius_measure
+:school_service_radius_measure rdf:type owl:NamedIndividual ;
+                               <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                               <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 1500 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#supermarket_service_radius_default
+:supermarket_service_radius_default rdf:type owl:NamedIndividual ,
+                                             <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                    <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :supermarket_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#supermarket_service_radius_measure
+:supermarket_service_radius_measure rdf:type owl:NamedIndividual ;
+                                    <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                    <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 400 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#transit_service_radius_default
+:transit_service_radius_default rdf:type owl:NamedIndividual ,
+                                         <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :transit_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#transit_service_radius_measure
+:transit_service_radius_measure rdf:type owl:NamedIndividual ;
+                                <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 400 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#transportnet_service_radius_default
+:transportnet_service_radius_default rdf:type owl:NamedIndividual ,
+                                              <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                     <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :transportnet_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#transportnet_service_radius_measure
+:transportnet_service_radius_measure rdf:type owl:NamedIndividual ;
+                                     <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                     <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 20 .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#wastewater_service_radius_default
+:wastewater_service_radius_default rdf:type owl:NamedIndividual ,
+                                            <https://standards.iso.org/iso-iec/5087/-1/ed-1/en/ontology/CityUnits/Length> ;
+                                   <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasValue> :wastewater_service_radius_measure .
+
+
+###  http://ontology.eil.utoronto.ca/Toronto/Toronto#wastewater_service_radius_measure
+:wastewater_service_radius_measure rdf:type owl:NamedIndividual ;
+                                   <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasUnit> <http://ontology.eil.utoronto.ca/ISO21972/iso21972#metre> ;
+                                   <http://ontology.eil.utoronto.ca/ISO21972/iso21972#hasNumericalValue> 30 .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+<http://ontology.eil.utoronto.ca/HPCDM/QuantityAllowance> rdfs:label "Maximum" .
+
+
+<http://ontology.eil.utoronto.ca/HPCDM/QuantityEquivalence> rdfs:label "Fixed value" .
+
+
+<http://ontology.eil.utoronto.ca/HPCDM/QuantityRequirement> rdfs:label "Minimum" .
+
+
+<http://ontology.eil.utoronto.ca/HPCDM/avg_inpatients_daily_per_bed> rdfs:label "average inpatients daily per bed" .
+
+
+<http://ontology.eil.utoronto.ca/HPCDM/person_per_day> rdfs:label "person(s) per day" .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
