@@ -15,10 +15,10 @@ Note: Environment variables (currently only the SPARQL_ENDPOINT) may be defined 
 * SPARQL_ENDPOINT=http://compass.project.urbandatacentre.ca/repositories/CDT_Rules
 
 Clone the respository, then build the container by running the following in the folder (hpcdm-dashboard):
-sudo docker build --progress=plain -t dashboard_img .
+docker build --progress=plain -t dashboard_img .
 
 Running the container:
-sudo docker run -d -p 7860:7860 --name demo_container --restart unless-stopped dashboard_img
+docker run -d -p 7860:7860 --name demo_container --restart unless-stopped dashboard_img
 
 ## Documentation
 See [the documentation](https://github.com/csse-uoft/hpcdm-dashboard/wiki/Documentation) for more details.
