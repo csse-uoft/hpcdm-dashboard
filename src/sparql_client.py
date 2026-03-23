@@ -414,7 +414,7 @@ def fetch_zoning_compliance(endpoint,prefixes,pid,property):
     query = f"""
     {prefixes}
 
-    SELECT DISTINCT ?nearbyp ?nearbypwkt ?zstring ?ctlabel ?limit ?vunit ?actualvalue ?actualunit ?compliancestatus WHERE {{
+    SELECT DISTINCT ?nearbyp ?nearbypwkt ?zstring ?ctlabel ?limit ?unit ?actualvalue ?actualunit ?compliancestatus WHERE {{
     #if we are looking for the neighbourhood of a specific parcel
     <{pid}> loc:hasLocation [geo:asWKT ?pwkt].
     
@@ -465,23 +465,24 @@ def fetch_zoning_compliance(endpoint,prefixes,pid,property):
     }}
     
     #logic to define a new column to identify whether a constraint is violated
-    BIND(COALESCE(
-    IF(!BOUND(?actualvalue) || !BOUND(?limit), "unknown",
-        IF(BOUND(?vunit) && BOUND(?aunit) && ?vunit != ?aunit, "incompatible units",
-        IF(?constraint_type = hp:QuantityAllowance,
-            IF(?actualvalue > ?limit, "noncompliant", "compliant"),
-            IF(?constraint_type = hp:QuantityRequirement,
-            IF(?actualvalue < ?limit, "noncompliant", "compliant"),
-            IF(?constraint_type = hp:QuantityEquivalence,
-                IF(?actualvalue != ?limit, "noncompliant", "compliant"),
-                "unknown"
+    BIND(xsd:double(?actualvalue) AS ?numActual)
+        BIND(xsd:double(?limit) AS ?numLimit)BIND(COALESCE(
+        IF(!BOUND(?numActual) || !BOUND(?numLimit), "unknown",
+            IF(BOUND(?vunit) && BOUND(?aunit) && ?vunit != ?aunit, "incompatible units",
+            IF(?constraint_type = hp:QuantityAllowance,
+                IF(?numActual > ?numLimit, "noncompliant", "compliant"),
+                IF(?constraint_type = hp:QuantityRequirement,
+                IF(?numActual < ?numLimit, "noncompliant", "compliant"),
+                IF(?constraint_type = hp:QuantityEquivalence,
+                    IF(?numActual != ?numLimit, "noncompliant", "compliant"),
+                    "unknown"
+                )
+                )
             )
             )
-        )
-        )
-    ),
-    "unknown" # A safety net if the IF logic crashes
-    ) AS ?compliancestatus)
+        ),
+        "unknown"
+        ) AS ?compliancestatus)
 }}
     """
     df = run_sparql_to_data(query, endpoint,query_vars)
