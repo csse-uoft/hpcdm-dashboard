@@ -98,7 +98,7 @@ def process_address(endpoint,address):
     """
     """Returns a parcel ID, referenced address, SPARQL lookup query, and map given user address input"""
     if not address:
-        return None, "Please enter an address.", "", go.Figure()
+        return None, "Please enter an address.", "", go.Figure(),go.Figure(),"Select..."
 
     lat, lon, full_address = geocode_logic(address)
 
